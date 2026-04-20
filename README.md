@@ -2,6 +2,11 @@
 
 An end-to-end Data Engineering & Generative AI project that bridges the gap between natural language (plain English) and structured SQL databases. This agent dynamically reads database schemas, writes SQL queries on the fly, executes them against an in-memory database, catches its own syntax errors to self-correct, and translates raw tabular data back into conversational insights—all without any human intervention.
 
+## 🌐 Live Demo
+
+🚀 Experience an Interactive Live Chatbot:  
+👉 [Open Live App](https://autonomous-sql-agent-6fjky6ynvy9zs8smcy8ahm.streamlit.app/)
+
 ## 🌟 Key Features
 * **ReAct Agent Architecture:** Utilizes LangChain's SQL Toolkits to create a Reason-Act-Observe loop that allows the LLM to recursively inspect database schemas and debug its own queries.
 * **Dual AI Providers:** Dynamically switch between **Google Gemini** APIs and **Hugging Face Serverless Inference API** (bringing support to completely open-source, ungated models like `Qwen/Qwen2.5-7B-Instruct`).
