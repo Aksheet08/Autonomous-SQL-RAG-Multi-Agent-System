@@ -12,7 +12,6 @@ __pycache__/
 # Database and Vector Stores
 finance.db
 real_estate.db
-chroma_db/
 
 # VS Code / IDEs
 .vscode/

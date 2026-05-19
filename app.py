@@ -1,5 +1,12 @@
 import streamlit as st
 import os
+try:
+    __import__('pysqlite3')
+    import sys
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ImportError:
+    pass
+
 os.environ["USE_TF"] = "0"
 os.environ["USE_TORCH"] = "1"
 from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
