@@ -2,13 +2,7 @@
 
 An enterprise-grade **Multi-Agent System** that bridges the gap between natural language, messy real-world databases, and unstructured policy documents. 
 
-This agent dynamically reads an 82-column database schema, writes complex SQL queries on the fly, searches through internal municipal zoning and tax documents, and synthesizes answers using a **LangGraph State Machine**—all protected by strict human-in-the-loop (HITL) execution guardrails.
-
-## 📊 About the Ames Housing Dataset
-This project utilizes the **Ames Housing Dataset** (compiled by Dean De Cock), a widely respected benchmark containing real-world data on **2,930 individual residential property sales** in Ames, Iowa, from 2006 to 2010. 
-* **High-Dimensional Complexity:** Features 82 distinct columns detailing property size, quality, building materials, zoning codes, and sales details.
-* **Cryptic Encoding:** Many columns use encoded acronyms (e.g., `MS_Zoning = 'RL'` for Residential Low Density). This agent leverages RAG as a semantic dictionary to decode queries before executing them.
-* **Official Documentation:** Check out the official [Ames Housing Codebook](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) for detailed column definitions.
+This agent dynamically reads an 82-column database schema (Ames Housing Dataset) , writes complex SQL queries on the fly, searches through internal municipal zoning and tax documents, and synthesizes answers using a **LangGraph State Machine**—all protected by strict human-in-the-loop (HITL) execution guardrails.
 
 ## 🏗️ System Architecture
 ```mermaid
@@ -54,6 +48,12 @@ graph TD
 * **LLM Engine:** Gemini 1.5/2.5 or Hugging Face Inference Hub
 * **Frontend:** Streamlit
 * **Database:** SQLite3, Pandas
+
+## 📊 About the Ames Housing Dataset
+This project utilizes the **Ames Housing Dataset** (compiled by Dean De Cock), a widely respected benchmark containing real-world data on **2,930 individual residential property sales** in Ames, Iowa, from 2006 to 2010. 
+* **High-Dimensional Complexity:** Features 82 distinct columns detailing property size, quality, building materials, zoning codes, and sales details.
+* **Cryptic Encoding:** Many columns use encoded acronyms (e.g., `MS_Zoning = 'RL'` for Residential Low Density). This agent leverages RAG as a semantic dictionary to decode queries before executing them.
+* **Official Documentation:** Check out the official [Ames Housing Codebook](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) for detailed column definitions.
 
 ## 🚀 Installation & Setup
 
