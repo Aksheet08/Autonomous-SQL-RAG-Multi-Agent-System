@@ -1,5 +1,10 @@
-import streamlit as st
 import os
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["USE_TF"] = "0"
+os.environ["USE_TORCH"] = "1"
+
+import streamlit as st
+
 try:
     __import__('pysqlite3')
     import sys
@@ -7,8 +12,6 @@ try:
 except ImportError:
     pass
 
-os.environ["USE_TF"] = "0"
-os.environ["USE_TORCH"] = "1"
 from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
 from langchain_core.messages import HumanMessage, AIMessage
 from agent import SQLAgent
