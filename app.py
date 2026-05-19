@@ -77,6 +77,48 @@ with st.expander("System Architecture & Tech Stack"):
     * **Vector Store**: ChromaDB with `all-MiniLM-L6-v2` embeddings for Ames Zoning and Tax Laws.
     * **User Interface**: Streamlit with LangGraph Event Streaming.
     """)
+    
+    st.write("### 🏗️ Flowchart")
+    
+    # Render Mermaid using Streamlit HTML component
+    mermaid_code = """
+    graph TD
+        User([👤 User]) --> UI[💻 Streamlit UI]
+        UI --> Supervisor{🕵️ Supervisor Router}
+        
+        Supervisor -->|Database Queries| SQLExpert[📊 SQL Expert]
+        Supervisor -->|Policy/Zoning Queries| RAGExpert[📚 RAG Expert]
+        Supervisor -->|Greetings/Other| CasualChat[💬 Casual Chat]
+        
+        SQLExpert -->|Generates SQL| Guardrails{🛡️ Safety Guardrails}
+        Guardrails -->|Blocks Destructive SQL| Error[⚠️ Return Error]
+        Guardrails -->|Executes Safe SQL| DB[(🗄️ SQLite Database)]
+        
+        RAGExpert -->|Embeds & Searches| VectorDB[(🧠 Chroma Vector Store)]
+        
+        DB --> Synthesizer[✍️ Synthesizer]
+        VectorDB --> Synthesizer
+        Error --> Synthesizer
+        
+        Synthesizer --> UI
+        CasualChat --> UI
+    """
+    
+    import streamlit.components.v1 as components
+    components.html(
+        f"""
+        <div class="mermaid">
+            {mermaid_code}
+        </div>
+        <script type="module">
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            mermaid.initialize({{ startOnLoad: true }});
+        </script>
+        """,
+        height=600,
+        scrolling=True
+    )
+
 st.divider()
 
 st.write("### Ask the Database a Question")

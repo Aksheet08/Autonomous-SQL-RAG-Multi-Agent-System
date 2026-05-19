@@ -55,7 +55,10 @@ class SQLAgent:
             raise ValueError(f"Unknown provider: {provider}")
             
         # Initialize RAG Retriever
-        rag_embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        rag_embeddings = HuggingFaceEmbeddings(
+            model_name="all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'}
+        )
         self.vector_store = Chroma(persist_directory="chroma_db", embedding_function=rag_embeddings)
         self.retriever = self.vector_store.as_retriever(search_kwargs={"k": 3})
         
