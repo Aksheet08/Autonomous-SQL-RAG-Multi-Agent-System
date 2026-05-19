@@ -16,7 +16,7 @@ from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
 from langchain_core.messages import HumanMessage, AIMessage
 from agent import SQLAgent
 
-st.set_page_config(page_title="NL-to-SQL Agent", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Real Estate AI Agent", page_icon="🏡", layout="wide")
 
 # Sidebar for Database Schema and API Key
 with st.sidebar:
@@ -70,12 +70,12 @@ with st.sidebar:
         st.write("Enter API Key/Token to load schema...")
 
 # Main layout
-st.title("🤖 Autonomous Natural Language-to-SQL Agent")
+st.title("🏡 Autonomous Real Estate AI Agent")
 
 st.markdown("""
-**A Hybrid Agentic Project showcasing AI Tool-Calling, Schema Introspection, and Retrieval-Augmented Generation (RAG).**
+**A Hybrid Agentic System powered by LangGraph, Schema Introspection, and RAG.**
 
-This agent bridges the gap between natural language, a relational database, and unstructured real estate policies. It runs on a **LangGraph Multi-Agent Architecture** and dynamically reads the schema, writes SQL queries on the fly, executes them against the database, searches local Ames zoning/tax documents, and translates raw data into conversational insights—all without any human intervention.
+This AI bridges the gap between natural language, the massive **Ames Housing database**, and **local municipal zoning and tax laws**. Ask it a complex property or legal question, and watch the Supervisor node autonomously route the task to the SQL Expert or the RAG Expert in real-time!
 """)
 
 with st.expander("System Architecture & Tech Stack"):
@@ -93,20 +93,20 @@ with st.expander("System Architecture & Tech Stack"):
     # Render Mermaid using Streamlit HTML component
     mermaid_code = """
     graph TD
-        User([👤 User]) --> UI[💻 Streamlit UI]
-        UI --> Supervisor{🕵️ Supervisor Router}
+        User(["👤 User"]) --> UI["💻 Streamlit UI"]
+        UI --> Supervisor{"🕵️ Supervisor Router"}
         
-        Supervisor -->|Database Queries| SQLExpert[📊 SQL Expert]
-        Supervisor -->|Policy/Zoning Queries| RAGExpert[📚 RAG Expert]
-        Supervisor -->|Greetings/Other| CasualChat[💬 Casual Chat]
+        Supervisor -->|Database Queries| SQLExpert["📊 SQL Expert"]
+        Supervisor -->|Policy/Zoning Queries| RAGExpert["📚 RAG Expert"]
+        Supervisor -->|Greetings/Other| CasualChat["💬 Casual Chat"]
         
-        SQLExpert -->|Generates SQL| Guardrails{🛡️ Safety Guardrails}
-        Guardrails -->|Blocks Destructive SQL| Error[⚠️ Return Error]
-        Guardrails -->|Executes Safe SQL| DB[(🗄️ SQLite Database)]
+        SQLExpert -->|Generates SQL| Guardrails{"🛡️ Safety Guardrails"}
+        Guardrails -->|Blocks Destructive SQL| Error["⚠️ Return Error"]
+        Guardrails -->|Executes Safe SQL| DB[("🗄️ SQLite Database")]
         
-        RAGExpert -->|Embeds & Searches| VectorDB[(🧠 Chroma Vector Store)]
+        RAGExpert -->|Embeds & Searches| VectorDB[("🧠 Chroma Vector Store")]
         
-        DB --> Synthesizer[✍️ Synthesizer]
+        DB --> Synthesizer["✍️ Synthesizer"]
         VectorDB --> Synthesizer
         Error --> Synthesizer
         
