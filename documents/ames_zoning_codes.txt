@@ -1,0 +1,16 @@
+# Ames, Iowa - MS Zoning Codes Guide
+
+The `MS_Zoning` column in the database identifies the general zoning classification of the sale.
+
+- **A (agr)**: Agriculture. Areas designated for farming and agricultural use.
+- **C (all)**: Commercial. Areas designated for commercial business and trade.
+- **FV**: Floating Village Residential. A high-density residential area with mixed-use elements.
+- **I (all)**: Industrial. Areas designated for manufacturing and industrial facilities.
+- **RH**: Residential High Density. Allows for multi-family dwellings, apartment complexes, and high-density housing.
+- **RL**: Residential Low Density. Primarily single-family detached homes with larger lot sizes.
+- **RM**: Residential Medium Density. Allows for a mix of single-family homes, duplexes, and townhomes.
+
+## Additional Zoning Rules
+- Properties in **RL (Residential Low Density)** zones must have a minimum lot area of 8,000 square feet.
+- Properties in **RM (Residential Medium Density)** zones are permitted to have Accessory Dwelling Units (ADUs), provided the lot is over 6,000 square feet.
+- Commercial (**C (all)**) properties are subject to a different tax assessment tier and must allocate 20% of their lot area to parking.

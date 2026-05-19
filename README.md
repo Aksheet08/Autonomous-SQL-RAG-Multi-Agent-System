@@ -1,6 +1,32 @@
-# 🤖 Autonomous Natural Language-to-SQL Agent
+# 🏡 Autonomous Hybrid Real Estate AI Agent
 
-An end-to-end Data Engineering & Generative AI project that bridges the gap between natural language (plain English) and structured SQL databases. This agent dynamically reads database schemas, writes SQL queries on the fly, executes them against an in-memory database, catches its own syntax errors to self-correct, and translates raw tabular data back into conversational insights—all without any human intervention.
+An enterprise-grade **Multi-Agent System** that bridges the gap between natural language, messy real-world databases, and unstructured policy documents. 
+
+This agent dynamically reads an 82-column database schema, writes complex SQL queries on the fly, searches through internal municipal zoning and tax documents, and synthesizes answers using a **LangGraph State Machine**—all protected by strict human-in-the-loop (HITL) execution guardrails.
+
+## 🏗️ System Architecture
+```mermaid
+graph TD
+    User([👤 User]) --> UI[💻 Streamlit UI]
+    UI --> Supervisor{🕵️ Supervisor Router}
+    
+    Supervisor -->|Database Queries| SQLExpert[📊 SQL Expert]
+    Supervisor -->|Policy/Zoning Queries| RAGExpert[📚 RAG Expert]
+    Supervisor -->|Greetings/Other| CasualChat[💬 Casual Chat]
+    
+    SQLExpert -->|Generates SQL| Guardrails{🛡️ Safety Guardrails}
+    Guardrails -->|Blocks Destructive SQL| Error[⚠️ Return Error]
+    Guardrails -->|Executes Safe SQL| DB[(🗄️ SQLite Database)]
+    
+    RAGExpert -->|Embeds & Searches| VectorDB[(🧠 Chroma Vector Store)]
+    
+    DB --> Synthesizer[✍️ Synthesizer]
+    VectorDB --> Synthesizer
+    Error --> Synthesizer
+    
+    Synthesizer --> UI
+    CasualChat --> UI
+```
 
 ## 🌐 Live Demo
 
@@ -8,17 +34,20 @@ An end-to-end Data Engineering & Generative AI project that bridges the gap betw
 👉 [Open Live App](https://autonomous-sql-agent-6fjky6ynvy9zs8smcy8ahm.streamlit.app/)
 
 ## 🌟 Key Features
-* **ReAct Agent Architecture:** Utilizes LangChain's SQL Toolkits to create a Reason-Act-Observe loop that allows the LLM to recursively inspect database schemas and debug its own queries.
-* **Dual AI Providers:** Dynamically switch between **Google Gemini** APIs and **Hugging Face Serverless Inference API** (bringing support to completely open-source, ungated models like `Qwen/Qwen2.5-7B-Instruct`).
-* **Financial Mock Database:** Automatically provisions an embedded SQLite database containing realistic structural mock data for `clients`, `accounts`, `transactions`, and `loans`.
-* **Thought Visualization UI:** Built on Streamlit using Langchain's native `StreamlitCallbackHandler`, allowing users to literally "see" the intermediate SQL queries and raw data returns the model is reviewing in real-time.
+* **Multi-Agent Architecture (LangGraph):** Upgraded from a simple LangChain ReAct loop to a scalable LangGraph architecture featuring a Supervisor Router, a SQL Expert, and a RAG Expert.
+* **Retrieval-Augmented Generation (RAG):** Uses a local ChromaDB vector store to embed local Ames zoning laws and tax rules, acting as a dynamic "Data Dictionary" for cryptic database columns (e.g. knowing that "Residential Low Density" maps to `MS_Zoning = 'RL'`).
+* **Real-World Dataset:** Automatically provisions an embedded SQLite database containing the massive **Ames Housing Dataset** (2,930 rows, 82 columns) to demonstrate true schema introspection capabilities.
+* **Safety Execution Guardrails:** The SQL Engine intercepts and scans all LLM-generated queries for destructive actions (`DROP`, `DELETE`, `UPDATE`, `INSERT`). Malicious queries are instantly blocked before hitting the database.
+* **Thought Visualization UI:** Built on Streamlit, allowing users to watch the LangGraph event stream in real-time to see exactly which sub-agents are being activated.
+* **Dual AI Providers:** Dynamically switch between **Google Gemini** APIs and **Hugging Face Serverless Inference API** (bringing support to completely open-source models).
 
 ## 🛠️ Technology Stack
 * **Language:** Python
-* **Orchestration:** LangChain (`create_sql_agent`, `SQLDatabase`)
+* **Orchestration:** LangGraph (`StateGraph`, `Nodes`, `Edges`)
+* **Vector Store / RAG:** ChromaDB, `sentence-transformers` (`all-MiniLM-L6-v2`)
 * **LLM Engine:** Gemini 1.5/2.5 or Hugging Face Inference Hub
 * **Frontend:** Streamlit
-* **Database:** SQLite3
+* **Database:** SQLite3, Pandas
 
 ## 🚀 Installation & Setup
 
@@ -43,7 +72,14 @@ An end-to-end Data Engineering & Generative AI project that bridges the gap betw
    pip install -r requirements.txt
    ```
 
-4. **Run the Application:**
+4. **Initialize the Database and Knowledge Base:**
+   Download the real-world dataset and embed the zoning documents:
+   ```bash
+   python db_setup.py
+   python rag_setup.py
+   ```
+
+5. **Run the Application:**
    Start the Streamlit development server:
    ```bash
    streamlit run app.py
@@ -55,9 +91,10 @@ You do *not* need to hard-code your environment variables. The Streamlit UI is b
 * Your **Hugging Face Token** (Requires Read/Inference access if using gated models like Llama-3)
 
 ## 💡 Example Queries
-* "Which clients have a total balance across all their accounts over $100k?"
-* "What is the principal remaining on loans for clients who joined in 2021?"
-* "Show me all transactions that occurred at a Grocery Store, mapped to the client's first name."
+* **Database Query:** "What is the average Sale_Price of homes that have an 'Excellent' Basement_Qual?"
+* **Policy Query (RAG):** "If I buy a property in an RM zone, can I build an Accessory Dwelling Unit?"
+* **Hybrid Query:** "What is the average Lot_Area for homes in a Residential Low Density zone?" *(The agent will use RAG to map 'Low Density' to 'RL', and then write the SQL!)*
+* **Guardrail Test:** "Drop the properties table." *(Watch the execution engine block the request).*
 
 ---
-*Built as a showcase for Agentic Data Engineering workflows.*
+*Built as a showcase for Advanced Agentic Data Engineering workflows.*

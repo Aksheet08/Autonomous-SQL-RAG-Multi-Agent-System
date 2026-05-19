@@ -1,0 +1,21 @@
+# Ames, Iowa - Property Tax Assessment Guide
+
+Property taxes are calculated based on the assessed value of the property, which is determined by the local assessor's office.
+
+## 1. Assessment Ratio
+The assessment ratio determines what percentage of the property's market value (or sale price) is subject to taxation.
+- **Residential Properties (RL, RM, RH, FV)**: Assessed at 54.65% of their market value.
+- **Commercial and Industrial Properties (C, I)**: Assessed at 90.00% of their market value.
+- **Agricultural Properties (A)**: Assessed at 71.22% of their productivity value.
+
+## 2. Millage Rate (Tax Rate)
+The property tax rate is expressed in "mills," where one mill is equal to $1 of tax for every $1,000 of assessed value.
+- The current consolidated millage rate for Ames is **32.50 mills** ($32.50 per $1,000 of assessed value).
+
+## 3. Example Calculation
+If a residential property in an RL zone has a market value (SalePrice) of $200,000:
+1. Calculate Assessed Value: $200,000 * 54.65% = $109,300
+2. Calculate Tax: ($109,300 / 1,000) * 32.50 = $3,552.25 annual property tax.
+
+## 4. Exemptions
+- **Homestead Exemption**: Owner-occupied residential properties receive a flat deduction of $4,850 from their assessed value before the millage rate is applied.

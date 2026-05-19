@@ -1,13 +1,16 @@
 import streamlit as st
 import os
+os.environ["USE_TF"] = "0"
+os.environ["USE_TORCH"] = "1"
 from langchain_community.callbacks.streamlit import StreamlitCallbackHandler
+from langchain_core.messages import HumanMessage, AIMessage
 from agent import SQLAgent
 
 st.set_page_config(page_title="NL-to-SQL Agent", page_icon="🤖", layout="wide")
 
 # Sidebar for Database Schema and API Key
 with st.sidebar:
-    st.title("🏦 Finance Database")
+    st.title("🏡 Real Estate Database")
     
     provider = st.radio("Select AI Provider", ["Gemini", "Hugging Face"])
     
@@ -60,23 +63,24 @@ with st.sidebar:
 st.title("🤖 Autonomous Natural Language-to-SQL Agent")
 
 st.markdown("""
-**An Agentic Project showcasing AI Tool-Calling, Schema Introspection, and ReAct Logic.**
+**A Hybrid Agentic Project showcasing AI Tool-Calling, Schema Introspection, and Retrieval-Augmented Generation (RAG).**
 
-This agent bridges the gap between natural language and a relational database. It runs on **LangChain** and dynamically reads the schema, writes SQL queries on the fly, executes them against the database, catches its own syntax errors to self-correct, and translates raw tabular data into conversational insights—all without any human intervention.
+This agent bridges the gap between natural language, a relational database, and unstructured real estate policies. It runs on a **LangGraph Multi-Agent Architecture** and dynamically reads the schema, writes SQL queries on the fly, executes them against the database, searches local Ames zoning/tax documents, and translates raw data into conversational insights—all without any human intervention.
 """)
 
 with st.expander("System Architecture & Tech Stack"):
     st.markdown("""
-    * **Orchestration**: LangChain (`create_sql_agent`)
+    * **Orchestration**: LangGraph (`StateGraph`, `Nodes`, `Edges`)
     * **LLM Backends**: Gemini / Hugging Face Open-Source Models
-    * **Agent Framework**: ReAct (Reason -> Act -> Observe) loop with recursive self-correction.
-    * **Database**: Local SQLite 3 containing mock Financial structures (`clients`, `accounts`, `transactions`, `loans`).
-    * **User Interface**: Streamlit with `StreamlitCallbackHandler` to visualize the agent's internal thought processes.
+    * **Agent Framework**: Multi-Agent Routing System (Supervisor -> SQL Expert / RAG Expert) with HITL Guardrails.
+    * **Database**: Local SQLite 3 containing the real Ames Housing dataset (2930 properties, 82 columns).
+    * **Vector Store**: ChromaDB with `all-MiniLM-L6-v2` embeddings for Ames Zoning and Tax Laws.
+    * **User Interface**: Streamlit with LangGraph Event Streaming.
     """)
 st.divider()
 
 st.write("### Ask the Database a Question")
-st.caption("Ask questions about clients, portfolios, transactions, and loans in plain English.")
+st.caption("Ask questions about property sales, lot areas, tax rates, and zoning codes in plain English.")
 
 # Check API key based on provider
 if provider == "Gemini" and not os.environ.get("GEMINI_API_KEY"):
@@ -89,7 +93,7 @@ elif provider == "Hugging Face" and not os.environ.get("HF_TOKEN"):
 # Initialize Agent
 if "agent" not in st.session_state:
     try:
-        with st.spinner("Connecting to Finance database and initializing Langchain..."):
+        with st.spinner("Connecting to Real Estate database and compiling LangGraph..."):
             st.session_state.agent = SQLAgent(
                 provider=st.session_state.get('selected_provider', 'Gemini'),
                 model_name=st.session_state.get('selected_model', 'gemini-1.5-flash')
@@ -102,28 +106,46 @@ if "agent" not in st.session_state:
 # Initialize chat session
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        {"role": "assistant", "content": "Hello! I am an Autonomous SQL Agent. I can query the database directly. What would you like to know?"}
+        {"role": "assistant", "content": "Hello! I am a Hybrid Real Estate AI Agent. I can query the property database and look up Ames zoning rules. What would you like to know?"}
     ]
 
 # Display chat messages
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-if prompt := st.chat_input(placeholder="e.g. Which clients have a balance over $100k?"):
+if prompt := st.chat_input(placeholder="e.g. What is the average lot area for RL zoned homes?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
     with st.chat_message("assistant"):
-        st_callback = StreamlitCallbackHandler(st.container())
-        
         try:
-            # Langchain invoke with the streamlit callback to visualize thoughts and SQL tool execution
-            response = st.session_state.agent.agent_executor.invoke(
-                {"input": prompt},
-                {"callbacks": [st_callback]}
-            )
-            
-            final_answer = response["output"]
+            with st.status("Agent Thinking...", expanded=True) as status:
+                final_answer = ""
+                
+                # Stream events from LangGraph
+                for event in st.session_state.agent.agent_executor.stream({"messages": [HumanMessage(content=prompt)]}):
+                    for node_name, node_state in event.items():
+                        st.write(f"🟢 **Node executed:** `{node_name}`")
+                        
+                        if node_name == "sql_expert" and "sql_query" in node_state:
+                            st.code(node_state["sql_query"], language="sql")
+                        elif node_name == "execute_sql" and "sql_result" in node_state:
+                            st.markdown("**Database Result:**")
+                            st.code(node_state["sql_result"])
+                        elif node_name == "rag_expert":
+                            st.info("🔍 Scanned Knowledge Base for Policies.")
+                            
+                        # Check if this node added messages to the state
+                        if "messages" in node_state and len(node_state["messages"]) > 0:
+                            last_msg = node_state["messages"][-1]
+                            if isinstance(last_msg, AIMessage):
+                                final_answer = last_msg.content
+                
+                status.update(label="Complete", state="complete", expanded=False)
+                
+            if not final_answer:
+                final_answer = "I'm sorry, I couldn't process that request."
+                
             st.write(final_answer)
             st.session_state.messages.append({"role": "assistant", "content": final_answer})
             

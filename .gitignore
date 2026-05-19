@@ -9,8 +9,10 @@ __pycache__/
 *$py.class
 *.so
 
-# Database
+# Database and Vector Stores
 finance.db
+real_estate.db
+chroma_db/
 
 # VS Code / IDEs
 .vscode/
