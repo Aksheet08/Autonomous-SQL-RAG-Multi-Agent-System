@@ -91,40 +91,60 @@ with st.expander("System Architecture & Tech Stack"):
     st.write("### 🏗️ Flowchart")
     
     # Render Mermaid using Streamlit HTML component
-    mermaid_code = """
-    graph TD
-        User[User] --> UI[Streamlit UI]
-        UI --> Supervisor{Supervisor Router}
-        
-        Supervisor -->|Database Queries| SQLExpert[SQL Expert]
-        Supervisor -->|Policy Queries| RAGExpert[RAG Expert]
-        Supervisor -->|Other| CasualChat[Casual Chat]
-        
-        SQLExpert -->|Generates SQL| Guardrails{Safety Guardrails}
-        Guardrails -->|Blocked Query| Error[Return Error]
-        Guardrails -->|Safe Query| DB[(SQLite Database)]
-        
-        RAGExpert -->|Search| VectorDB[(Chroma Vector Store)]
-        
-        DB --> Synthesizer[Synthesizer]
-        VectorDB --> Synthesizer
-        Error --> Synthesizer
-        
-        Synthesizer --> UI
-        CasualChat --> UI
-        """
+   
+    mermaid_code = """flowchart TD
+    User([👤 User]) --> UI[💻 Streamlit UI]
+    UI --> Supervisor{🕵️ Supervisor Router}
+    
+    Supervisor -->|Database Queries| SQLExpert[📊 SQL Expert]
+    Supervisor -->|Policy/Zoning Queries| RAGExpert[📚 RAG Expert]
+    Supervisor -->|Greetings/Other| CasualChat[💬 Casual Chat]
+    
+    SQLExpert -->|Generates SQL| Guardrails{🛡️ Safety Guardrails}
+    Guardrails -->|Blocks Destructive SQL| Error[⚠️ Return Error]
+    Guardrails -->|Executes Safe SQL| DB[(🗄️ SQLite Database)]
+    
+    RAGExpert -->|Embeds & Searches| VectorDB[(🧠 Chroma Vector Store)]
+    
+    DB --> Synthesizer[✍️ Synthesizer]
+    VectorDB --> Synthesizer
+    Error --> Synthesizer
+    
+    Synthesizer --> UI
+    CasualChat --> UI"""
+    
     
     import streamlit.components.v1 as components
     components.html(
         f"""
-        <div class="mermaid">
-            {mermaid_code}
-        </div>
-    
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-        <script>
-            mermaid.initialize({{ startOnLoad: true }});
-        </script>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{
+                    margin: 0;
+                    background-color: transparent;
+                }}
+                .mermaid {{
+                    display: flex;
+                    justify-content: center;
+                }}
+            </style>
+        </head>
+        <body>
+            <pre class="mermaid">
+{mermaid_code}
+            </pre>
+            <script type="module">
+                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                mermaid.initialize({{
+                    startOnLoad: true,
+                    theme: 'default'
+                }});
+            </script>
+        </body>
+        </html>
         """,
         height=600,
         scrolling=True
