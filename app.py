@@ -120,8 +120,9 @@ with st.expander("System Architecture & Tech Stack"):
         <div class="mermaid">
             {mermaid_code}
         </div>
-        <script type="module">
-            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+        <script>
             mermaid.initialize({{ startOnLoad: true }});
         </script>
         """,
