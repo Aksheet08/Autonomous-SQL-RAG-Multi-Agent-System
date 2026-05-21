@@ -6,7 +6,7 @@ This agent dynamically reads an 82-column database schema (Ames Housing Dataset)
 
 ## 🏗️ System Architecture
 ```mermaid
-graph TD
+flowchart TD
     User([👤 User]) --> UI[💻 Streamlit UI]
     UI --> Supervisor{🕵️ Supervisor Router}
     
