@@ -102,5 +102,3 @@ You do *not* need to hard-code your environment variables. The Streamlit UI is b
 * **Hybrid Query:** "What is the average Lot_Area for homes in a Residential Low Density zone?" *(The agent will use RAG to map 'Low Density' to 'RL', and then write the SQL!)*
 * **Guardrail Test:** "Drop the properties table." *(Watch the execution engine block the request).*
 
----
-*Built as a showcase for Advanced Agentic Data Engineering workflows.*
