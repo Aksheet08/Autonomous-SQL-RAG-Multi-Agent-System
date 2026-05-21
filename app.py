@@ -93,20 +93,20 @@ with st.expander("System Architecture & Tech Stack"):
     # Render Mermaid using Streamlit HTML component
    
     mermaid_code = """flowchart TD
-    User([👤 User]) --> UI[💻 Streamlit UI]
-    UI --> Supervisor{🕵️ Supervisor Router}
+    User(["👤 User"]) --> UI["💻 Streamlit UI"]
+    UI --> Supervisor{"🕵️ Supervisor Router"}
     
-    Supervisor -->|Database Queries| SQLExpert[📊 SQL Expert]
-    Supervisor -->|Policy/Zoning Queries| RAGExpert[📚 RAG Expert]
-    Supervisor -->|Greetings/Other| CasualChat[💬 Casual Chat]
+    Supervisor -->|Database Queries| SQLExpert["📊 SQL Expert"]
+    Supervisor -->|Policy/Zoning Queries| RAGExpert["📚 RAG Expert"]
+    Supervisor -->|Greetings/Other| CasualChat["💬 Casual Chat"]
     
-    SQLExpert -->|Generates SQL| Guardrails{🛡️ Safety Guardrails}
-    Guardrails -->|Blocks Destructive SQL| Error[⚠️ Return Error]
-    Guardrails -->|Executes Safe SQL| DB[(🗄️ SQLite Database)]
+    SQLExpert -->|Generates SQL| Guardrails{"🛡️ Safety Guardrails"}
+    Guardrails -->|Blocks Destructive SQL| Error["⚠️ Return Error"]
+    Guardrails -->|Executes Safe SQL| DB[("🗄️ SQLite Database")]
     
-    RAGExpert -->|Embeds & Searches| VectorDB[(🧠 Chroma Vector Store)]
+    RAGExpert -->|Embeds and Searches| VectorDB[("🧠 Chroma Vector Store")]
     
-    DB --> Synthesizer[✍️ Synthesizer]
+    DB --> Synthesizer["✍️ Synthesizer"]
     VectorDB --> Synthesizer
     Error --> Synthesizer
     
