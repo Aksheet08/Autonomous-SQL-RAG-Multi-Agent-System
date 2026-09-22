@@ -1,4 +1,11 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Enable LangSmith tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "real-estate-agent-eval"
+
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 os.environ["USE_TF"] = "0"
 os.environ["USE_TORCH"] = "1"
@@ -22,41 +29,25 @@ st.set_page_config(page_title="Real Estate AI Agent", page_icon="🏡", layout="
 with st.sidebar:
     st.title("🏡 Real Estate Database")
     
-    provider = st.radio("Select AI Provider", ["Gemini", "Hugging Face"])
-    
-    if provider == "Gemini":
-        api_key_input = st.text_input("Enter your Gemini API Key", type="password")
-        if api_key_input:
-            os.environ["GEMINI_API_KEY"] = api_key_input
-            
-        working_models = [
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
-            "gemini-2.5-flash",
-            "gemini-2.5-pro",
-            "gemini-pro"
-        ]
-    else:
-        api_key_input = st.text_input("Enter your Hugging Face Token (Read)", type="password")
-        if api_key_input:
-            os.environ["HF_TOKEN"] = api_key_input
-            os.environ["HUGGINGFACEHUB_API_TOKEN"] = api_key_input
-            
-        working_models = [
-            "Qwen/Qwen2.5-7B-Instruct",
-            "meta-llama/Meta-Llama-3-8B-Instruct",
-            "mistralai/Mistral-7B-Instruct-v0.3",
-            "google/gemma-2-9b-it"
-        ]
+    api_key_input = st.text_input("Enter your Gemini API Key", type="password")
+    if api_key_input:
+        os.environ["GEMINI_API_KEY"] = api_key_input
         
+    working_models = [
+        "gemini-2.5-flash",
+        "gemini-1.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.5-pro",
+        "gemini-pro"
+    ]
+    
     st.divider()
     st.subheader("Model Selection")
     
     selected_model = st.selectbox("Select Model", working_models)
     
-    # If the user selects a new provider or model, re-initialize the agent
-    if "selected_provider" not in st.session_state or "selected_model" not in st.session_state or st.session_state.selected_provider != provider or st.session_state.selected_model != selected_model:
-        st.session_state.selected_provider = provider
+    # If the user selects a new model, re-initialize the agent
+    if "selected_model" not in st.session_state or st.session_state.selected_model != selected_model:
         st.session_state.selected_model = selected_model
         if "agent" in st.session_state:
             del st.session_state.agent
@@ -68,6 +59,14 @@ with st.sidebar:
         st.code(st.session_state.agent.get_schema_string(), language='sql')
     else:
         st.write("Enter API Key/Token to load schema...")
+        
+    st.divider()
+    st.subheader("Observability & Metrics")
+    st.link_button("📈 Open LangSmith Dashboard", "https://smith.langchain.com/o/default/projects/p/real-estate-agent-eval")
+    
+    if os.path.exists("evaluation_results.csv"):
+        if st.button("📊 Toggle Ragas Report"):
+            st.session_state.show_eval = not st.session_state.get("show_eval", False)
 
 # Main layout
 st.title("🏡 Autonomous Real Estate AI Agent")
@@ -78,68 +77,24 @@ st.markdown("""
 This AI bridges the gap between natural language, the massive **Ames Housing database**, and **local municipal zoning and tax laws**. Ask it a complex property or legal question, and watch the Supervisor node autonomously route the task to the SQL Expert or the RAG Expert in real-time!
 """)
 
-with st.expander("System Architecture & Tech Stack"):
-    st.markdown("""
-    * **Orchestration**: LangGraph (`StateGraph`, `Nodes`, `Edges`)
-    * **LLM Backends**: Gemini / Hugging Face Open-Source Models
-    * **Agent Framework**: Multi-Agent Routing System (Supervisor -> SQL Expert / RAG Expert) with HITL Guardrails.
-    * **Database**: Local SQLite 3 containing the real Ames Housing dataset (2930 properties, 82 columns).
-    * **Vector Store**: ChromaDB with `all-MiniLM-L6-v2` embeddings for Ames Zoning and Tax Laws.
-    * **User Interface**: Streamlit with LangGraph Event Streaming.
-    """)
-    
-    st.write("### 🏗️ Flowchart")
-    
-    # Render Mermaid using Streamlit HTML component
-    mermaid_code = """
-    graph TD
-        User(["👤 User"]) --> UI["💻 Streamlit UI"]
-        UI --> Supervisor{"🕵️ Supervisor Router"}
-        
-        Supervisor -->|Database Queries| SQLExpert["📊 SQL Expert"]
-        Supervisor -->|Policy/Zoning Queries| RAGExpert["📚 RAG Expert"]
-        Supervisor -->|Greetings/Other| CasualChat["💬 Casual Chat"]
-        
-        SQLExpert -->|Generates SQL| Guardrails{"🛡️ Safety Guardrails"}
-        Guardrails -->|Blocks Destructive SQL| Error["⚠️ Return Error"]
-        Guardrails -->|Executes Safe SQL| DB[("🗄️ SQLite Database")]
-        
-        RAGExpert -->|Embeds & Searches| VectorDB[("🧠 Chroma Vector Store")]
-        
-        DB --> Synthesizer["✍️ Synthesizer"]
-        VectorDB --> Synthesizer
-        Error --> Synthesizer
-        
-        Synthesizer --> UI
-        CasualChat --> UI
-    """
-    
-    import streamlit.components.v1 as components
-    components.html(
-        f"""
-        <div class="mermaid">
-            {mermaid_code}
-        </div>
-        <script type="module">
-            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-            mermaid.initialize({{ startOnLoad: true }});
-        </script>
-        """,
-        height=600,
-        scrolling=True
-    )
+
 
 st.divider()
+
+if st.session_state.get("show_eval", False) and os.path.exists("evaluation_results.csv"):
+    st.subheader("📊 Ragas Evaluation Metrics")
+    st.caption("Auto-generated by `evaluate.py`. Scores range from 0.0 to 1.0 (Higher is better).")
+    import pandas as pd
+    df = pd.read_csv("evaluation_results.csv")
+    st.dataframe(df, use_container_width=True)
+    st.divider()
 
 st.write("### Ask the Database a Question")
 st.caption("Ask questions about property sales, lot areas, tax rates, and zoning codes in plain English.")
 
-# Check API key based on provider
-if provider == "Gemini" and not os.environ.get("GEMINI_API_KEY"):
+# Check API key
+if not os.environ.get("GEMINI_API_KEY"):
     st.warning("Please enter your Gemini API Key in the sidebar to start chatting.", icon="⚠️")
-    st.stop()
-elif provider == "Hugging Face" and not os.environ.get("HF_TOKEN"):
-    st.warning("Please enter your Hugging Face API Token in the sidebar to start chatting.", icon="⚠️")
     st.stop()
 
 # Initialize Agent
@@ -147,8 +102,7 @@ if "agent" not in st.session_state:
     try:
         with st.spinner("Connecting to Real Estate database and compiling LangGraph..."):
             st.session_state.agent = SQLAgent(
-                provider=st.session_state.get('selected_provider', 'Gemini'),
-                model_name=st.session_state.get('selected_model', 'gemini-1.5-flash')
+                model_name=st.session_state.get('selected_model', 'gemini-2.5-flash')
             )
         st.rerun() # Refresh so the sidebar gets the schema
     except Exception as e:

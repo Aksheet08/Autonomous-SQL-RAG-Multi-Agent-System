@@ -4,7 +4,7 @@ import operator
 
 from langchain_community.utilities import SQLDatabase
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, END
@@ -20,39 +20,23 @@ class AgentState(TypedDict):
     rag_result: str
 
 class SQLAgent:
-    def __init__(self, provider: str = "Gemini", model_name: str = "gemini-1.5-flash"):
+    def __init__(self, model_name: str = "gemini-2.5-flash"):
         # Ensure database is initialized
         db_setup.init_db()
         
         # Connect to the SQLite database
         self.db = SQLDatabase.from_uri(f"sqlite:///{db_setup.DB_PATH}")
         
-        if provider == "Gemini":
-            self.api_key = os.environ.get("GEMINI_API_KEY")
-            if not self.api_key:
-                raise ValueError("GEMINI_API_KEY environment variable not set.")
-            
-            # Initialize Gemini Model
-            self.llm = ChatGoogleGenerativeAI(
-                model=model_name,
-                temperature=0,
-                google_api_key=self.api_key
-            )
-        elif provider == "Hugging Face":
-            self.api_key = os.environ.get("HF_TOKEN")
-            if not self.api_key:
-                raise ValueError("HF_TOKEN environment variable not set.")
-                
-            # Initialize Hugging Face Endpoint
-            base_llm = HuggingFaceEndpoint(
-                repo_id=model_name,
-                task="text-generation",
-                max_new_tokens=512,
-                huggingfacehub_api_token=self.api_key,
-            )
-            self.llm = ChatHuggingFace(llm=base_llm)
-        else:
-            raise ValueError(f"Unknown provider: {provider}")
+        self.api_key = os.environ.get("GEMINI_API_KEY")
+        if not self.api_key:
+            raise ValueError("GEMINI_API_KEY environment variable not set.")
+        
+        # Initialize Gemini Model
+        self.llm = ChatGoogleGenerativeAI(
+            model=model_name,
+            temperature=0,
+            google_api_key=self.api_key
+        )
             
         # Initialize RAG Retriever
         rag_embeddings = HuggingFaceEmbeddings(
